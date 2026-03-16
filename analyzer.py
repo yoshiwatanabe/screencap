@@ -116,13 +116,16 @@ def process_image(
         "--model", config["copilot_model"],
     ]
     try:
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-            timeout=config.get("copilot_timeout", 60),
-        )
+        with tempfile.TemporaryDirectory() as tmp_cwd:
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                timeout=config.get("copilot_timeout", 60),
+                creationflags=subprocess.CREATE_NO_WINDOW,
+                cwd=tmp_cwd,
+            )
     except subprocess.TimeoutExpired:
         log.warning("analyzer: timeout processing %s", image_path.name)
         return None

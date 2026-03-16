@@ -115,29 +115,50 @@ foreach ($d in $dirs) {
 Write-Host ""
 Write-Host "Registering scheduled task..." -ForegroundColor Yellow
 
-$action = New-ScheduledTaskAction `
-    -Execute $pythonw `
-    -Argument "`"$RepoDir\main.py`"" `
-    -WorkingDirectory $RepoDir
+# Use XML registration to avoid PowerShell 5.1 vs 7 trigger serialization differences.
+# Omitting <Duration> inside <Repetition> means the task repeats indefinitely.
+$startTime = (Get-Date).AddMinutes(1).ToString("yyyy-MM-ddTHH:mm:ss")
+$taskXml = @"
+<?xml version="1.0" encoding="UTF-16"?>
+<Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+  <RegistrationInfo>
+    <Description>screencap: monitors screenshots, analyzes via Copilot CLI, organizes by category</Description>
+  </RegistrationInfo>
+  <Triggers>
+    <TimeTrigger>
+      <Repetition>
+        <Interval>PT2M</Interval>
+      </Repetition>
+      <StartBoundary>$startTime</StartBoundary>
+      <Enabled>true</Enabled>
+    </TimeTrigger>
+  </Triggers>
+  <Settings>
+    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
+    <StartWhenAvailable>true</StartWhenAvailable>
+    <RunOnlyIfNetworkAvailable>false</RunOnlyIfNetworkAvailable>
+    <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
+    <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>
+    <ExecutionTimeLimit>PT5M</ExecutionTimeLimit>
+    <Enabled>true</Enabled>
+  </Settings>
+  <Actions Context="Author">
+    <Exec>
+      <Command>$pythonw</Command>
+      <Arguments>"$RepoDir\main.py"</Arguments>
+      <WorkingDirectory>$RepoDir</WorkingDirectory>
+    </Exec>
+  </Actions>
+  <Principals>
+    <Principal id="Author">
+      <LogonType>InteractiveToken</LogonType>
+      <RunLevel>LeastPrivilege</RunLevel>
+    </Principal>
+  </Principals>
+</Task>
+"@
 
-# Trigger: repeat every 2 minutes for 9999 days (effectively indefinite)
-$trigger = New-ScheduledTaskTrigger -Once -At (Get-Date) `
-    -RepetitionInterval (New-TimeSpan -Minutes 2) `
-    -RepetitionDuration (New-TimeSpan -Days 9999)
-
-$settings = New-ScheduledTaskSettingsSet `
-    -ExecutionTimeLimit (New-TimeSpan -Minutes 2) `
-    -MultipleInstances IgnoreNew `
-    -StartWhenAvailable `
-    -RunOnlyIfNetworkAvailable:$false
-
-Register-ScheduledTask `
-    -TaskName "ScreencapMonitor" `
-    -Action $action `
-    -Trigger $trigger `
-    -Settings $settings `
-    -Description "screencap: monitors screenshots, analyzes via Copilot CLI, organizes by category" `
-    -Force | Out-Null
+Register-ScheduledTask -TaskName "ScreencapMonitor" -Xml $taskXml -Force | Out-Null
 
 if (Get-ScheduledTask -TaskName "ScreencapMonitor" -ErrorAction SilentlyContinue) {
     Write-Host "  task registered: ScreencapMonitor (every 2 minutes)" -ForegroundColor Green

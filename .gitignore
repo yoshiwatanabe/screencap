@@ -6,3 +6,6 @@ logs/
 *.lock
 __pycache__/
 *.pyc
+__*_crop.png
+__*_preview.png
+__*_half.png
