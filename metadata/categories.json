@@ -1,0 +1,9 @@
+{
+    "windows": ["settings", "explorer", "taskbar", "control-panel"],
+    "ai-tools": ["chatgpt", "copilot", "claude"],
+    "social-media": ["facebook", "twitter", "linkedin"],
+    "development": ["vscode", "terminal", "github"],
+    "communication": ["teams", "slack", "email"],
+    "monitoring": ["azure", "dashboard"],
+    "browser": ["edge", "chrome"]
+}

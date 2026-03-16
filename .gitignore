@@ -1,6 +1,7 @@
 config.json
 state.json
-metadata/
+metadata/*
+!metadata/categories.json
 logs/
 *.lock
 __pycache__/
