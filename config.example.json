@@ -1,0 +1,12 @@
+{
+  "watch_dir":        "C:\\Users\\USERNAME\\OneDrive\\Pictures\\Screenshots",
+  "output_dir":       "C:\\Users\\USERNAME\\OneDrive\\Pictures\\Screenshots\\Organized",
+  "max_age_minutes":  5,
+  "image_extensions": [".png", ".jpg", ".jpeg", ".bmp"],
+  "copilot_loader":   "C:\\Users\\USERNAME\\AppData\\Roaming\\npm\\node_modules\\@github\\copilot\\npm-loader.js",
+  "copilot_model":    "gpt-5.4",
+  "copilot_timeout":  60,
+  "metadata_dir":     "REPO_DIR\\metadata",
+  "log_file":         "REPO_DIR\\logs\\screencap.log",
+  "state_file":       "REPO_DIR\\state.json"
+}
