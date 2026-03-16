@@ -116,7 +116,7 @@ def process_image(
         "--model", config["copilot_model"],
     ]
     try:
-        with tempfile.TemporaryDirectory() as tmp_cwd:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp_cwd:
             result = subprocess.run(
                 cmd,
                 capture_output=True,
