@@ -12,7 +12,7 @@ No console window. No always-on process. Uses your GitHub Copilot subscription
 ## Quick Start
 
 ```powershell
-git clone <repo-url>
+git clone https://github.com/yoshiwatanabe/screencap.git
 cd screencap
 powershell -ExecutionPolicy Bypass -File setup.ps1
 ```
@@ -61,6 +61,7 @@ Key settings:
 | `output_dir` | `...\Organized` | Where categorized files go |
 | `max_age_minutes` | `5` | Files younger than this stay untouched |
 | `copilot_model` | `gpt-5.4` | Model for image analysis |
+| `copilot_timeout` | `60` | Seconds before a Copilot CLI call is abandoned (increase if you see frequent timeouts) |
 
 ## Daily Use
 
@@ -114,15 +115,31 @@ If you want to reprocess everything from scratch:
 ```powershell
 Disable-ScheduledTask -TaskName "ScreencapMonitor"
 Remove-Item state.json -ErrorAction SilentlyContinue
-Remove-Item metadata\categories.json -ErrorAction SilentlyContinue
 Enable-ScheduledTask -TaskName "ScreencapMonitor"
 ```
+
+> Note: `metadata\categories.json` is intentionally preserved on fresh start
+> since it is tracked in git. Delete it manually only if you want to rebuild
+> the category tree from scratch.
 
 ## Category Dictionary
 
 Categories grow automatically as new screenshots are analyzed. The dictionary
-lives at `metadata\categories.json` (gitignored). `others` is the implicit
-catch-all and is never written to the file.
+lives at `metadata\categories.json` and is **tracked in git** so it syncs
+across machines via `git pull`. `others` is the implicit catch-all and is
+never written to the file.
+
+To seed initial categories before first run, edit `metadata\categories.json`
+directly. Example:
+
+```json
+{
+  "windows": ["settings", "explorer"],
+  "ai-tools": ["chatgpt", "copilot", "claude"],
+  "development": ["vscode", "terminal", "github"],
+  "communication": ["teams", "slack", "email"]
+}
+```
 
 ## Run Tests
 
